@@ -85,7 +85,7 @@ export function ImageUpload({ onImageUpload, loading }: ImageUploadProps) {
           </div>
         ) : (
           <>
-            <div className="absolute top-0 left-0 w-full h-2 bg-blue-400/50 scanner-line shadow-[0_0_15px_5px] shadow-blue-400/50 blur-sm"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-green-400/50 scanner-line shadow-[0_0_15px_5px] shadow-green-400/50 blur-sm"></div>
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="bg-primary/10 p-4 rounded-full">
                 <UploadCloud className="h-12 w-12 text-primary" />
