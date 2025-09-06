@@ -99,7 +99,7 @@ export function ResultDisplay({
                 <div className="space-y-4">
                   <div>
                     {result.isEcoFriendly ? (
-                      <Badge className="bg-primary/20 text-primary-foreground border-primary/30 hover:bg-primary/20 py-1 px-3">
+                      <Badge className="bg-primary/20 text-white border-primary/30 hover:bg-primary/20 py-1 px-3">
                         <Leaf className="mr-2 h-4 w-4" />
                         Eco-Friendly
                       </Badge>
