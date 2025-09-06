@@ -86,3 +86,18 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes scan {
+  0%, 100% {
+    top: 0;
+    transform: translateY(-100%);
+  }
+  50% {
+    top: 100%;
+    transform: translateY(0%);
+  }
+}
+
+.scanner-line {
+  animation: scan 4s ease-in-out infinite;
+}
