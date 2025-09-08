@@ -1,10 +1,16 @@
+
+"use client";
+
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Leaf, RefreshCw, XCircle } from "lucide-react";
+import { Leaf, RefreshCw, XCircle, Volume2, VolumeX } from "lucide-react";
 import type { GenerateDetailedDescriptionOutput } from "@/ai/flows/generate-detailed-description";
+import { useEffect, useRef, useState } from "react";
+import { convertTextToSpeech } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 
 interface ResultDisplayProps {
   imageUrl: string;
@@ -19,6 +25,48 @@ export function ResultDisplay({
   loading,
   onReset,
 }: ResultDisplayProps) {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isAutoplayEnabled, setIsAutoplayEnabled] = useState(true);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (result && isAutoplayEnabled) {
+      const getAudio = async () => {
+        setIsAudioLoading(true);
+        try {
+          const { audioDataUri } = await convertTextToSpeech(result.description);
+          setAudioUrl(audioDataUri);
+        } catch (error) {
+          console.error("Failed to generate audio:", error);
+          toast({
+            title: "Audio Failed",
+            description: "Could not generate audio for the description.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsAudioLoading(false);
+        }
+      };
+      getAudio();
+    }
+  }, [result, isAutoplayEnabled, toast]);
+
+  useEffect(() => {
+    if (audioUrl && audioRef.current) {
+      audioRef.current.play().catch(console.error);
+    }
+  }, [audioUrl]);
+
+  const toggleAutoplay = () => {
+    setIsAutoplayEnabled(!isAutoplayEnabled);
+    if (!isAutoplayEnabled) {
+      audioRef.current?.pause();
+      setAudioUrl(null);
+    }
+  };
+
   return (
     <div className="w-full animate-in fade-in duration-500">
       <Card className="overflow-hidden shadow-lg bg-card/50">
@@ -36,6 +84,9 @@ export function ResultDisplay({
             <CardHeader className="px-0 pt-0">
               <div className="flex justify-between items-center">
                 <CardTitle className="font-headline text-2xl">Analysis Result</CardTitle>
+                <Button onClick={toggleAutoplay} variant="ghost" size="icon" className="text-muted-foreground" aria-label={isAutoplayEnabled ? "Disable audio" : "Enable audio"}>
+                  {isAutoplayEnabled ? <Volume2 /> : <VolumeX />}
+                </Button>
               </div>
             </CardHeader>
             <CardContent className="px-0 space-y-4">
@@ -79,6 +130,7 @@ export function ResultDisplay({
           </div>
         </div>
       </Card>
+      {audioUrl && <audio ref={audioRef} src={audioUrl} />}
     </div>
   );
 }
